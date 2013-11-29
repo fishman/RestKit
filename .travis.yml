@@ -1,13 +1,19 @@
 language: objective-c
 before_install:
-    - brew update
-    - brew uninstall xctool
-    - brew install xctool
-    - sudo easy_install cpp-coveralls
+    # - brew update
+    # - brew uninstall xctool
+    # - brew install xctool
+    # - sudo easy_install cpp-coveralls
+    - true
 install:
-    - bundle install
-    - bundle exec pod install
+    - true
+    # - bundle install
+    # - bundle exec pod install
 script:
-    - bundle exec rake server:start test test:building_without_core_data
+    - true
+    # - bundle exec rake server:start test test:building_without_core_data
 after_success:
-    - Tests/coveralls.rb -e Pods -e Vendor -e Tests -e Examples -e Docs -e Resources -x m -x mm -x c
+    - gcov
+    - gcov-4.2
+    - gcov-4.6
+    # - Tests/coveralls.rb -e Pods -e Vendor -e Tests -e Examples -e Docs -e Resources -x m -x mm -x c
