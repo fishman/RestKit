@@ -10,4 +10,4 @@ install:
 script:
     - bundle exec rake server:start test test:building_without_core_data
 after_success:
-    - Tests/coveralls.rb -e Pods -e Vendor -e Tests -e Examples -e Docs -e Resources -x .m -x .mm -x .c
+    - Tests/coveralls.rb -e Pods -e Vendor -e Tests -e Examples -e Docs -e Resources -x m -x mm -x c

@@ -27,7 +27,7 @@ end
 
 opts.on('-x', '--extension EXT', 'Source file extension to process') do |v|
    extensionsToProcess << v
-   coveralls_cmd.concat(" -x #{v}")
+   coveralls_cmd.concat(" -x .#{v}")
 end
 
 opts.on_tail("-?", "--help", "Show this message") do
