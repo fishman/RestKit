@@ -11,20 +11,20 @@ RakeUp::ServerTask.new do |t|
 end
 
 namespace :test do
-  task :prepare do    
+  task :prepare do
     system(%Q{mkdir -p "RestKit.xcworkspace/xcshareddata/xcschemes" && cp Tests/Schemes/*.xcscheme "RestKit.xcworkspace/xcshareddata/xcschemes/"})
   end
-  
+
   desc "Run the unit tests for iOS"
   task :ios => :prepare do
-    $ios_success = system("xctool -workspace RestKit.xcworkspace -scheme RestKitTests -sdk iphonesimulator test -test-sdk iphonesimulator ONLY_ACTIVE_ARCH=NO")
+    $ios_success = system("xctool -workspace RestKit.xcworkspace -scheme RestKitTests -sdk iphonesimulator test -test-sdk iphonesimulator ONLY_ACTIVE_ARCH=NO GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES")
   end
-  
+
   desc "Run the unit tests for OS X"
   task :osx => :prepare do
     $osx_success = system("xctool -workspace RestKit.xcworkspace -scheme RestKitFrameworkTests -sdk macosx test -test-sdk macosx")
   end
-  
+
   # Provides validation that RestKit continues to build without Core Data. This requires conditional compilation that is error prone
   task :building_without_core_data do
     system("cd Examples/RKTwitter && pod install")
@@ -90,7 +90,7 @@ namespace :docs do
     run(command, 1)
     puts "Generated HTML documentationa at Docs/API/html"
   end
-  
+
   desc "Check that documentation can be built from the source code via appledoc successfully."
   task :check => 'appledoc:check' do
     command = apple_doc_command << " --no-create-html --verbose 5 `find Code/ -name '*.h'`"
@@ -104,21 +104,21 @@ namespace :docs do
       exit(exitstatus)
     else
       puts "!! appledoc generation failed with a fatal error"
-    end    
+    end
     exit(exitstatus)
   end
-  
+
   desc "Generate & install a docset into Xcode from the current sources"
   task :install => 'appledoc:check' do
     command = apple_doc_command << " --install-docset `find Code/ -name '*.h'`"
     run(command, 1)
   end
-  
+
   desc "Build and publish the documentation set to the remote server (using rsync over SSH)"
   task :publish, :version, :destination, :publish_feed do |t, args|
     args.with_defaults(:version => File.read("VERSION").chomp, :destination => "restkit.org:/var/www/public/restkit.org/public/api/", :publish_feed => 'true')
     version = args[:version]
-    destination = args[:destination]    
+    destination = args[:destination]
     puts "Generating RestKit docset for version #{version}..."
     command = apple_doc_command <<
             " --keep-intermediate-files" <<
@@ -130,7 +130,7 @@ namespace :docs do
     versioned_destination = File.join(destination, version)
     command = "rsync -rvpPe ssh --delete Docs/API/html/ #{versioned_destination}"
     run(command)
-    
+
     should_publish_feed = %{yes true 1}.include?(args[:publish_feed].downcase)
     if $?.exitstatus == 0 && should_publish_feed
       command = "rsync -rvpPe ssh Docs/API/publish/* #{destination}"
@@ -145,7 +145,7 @@ namespace :build do
     ios_sdks = %w{iphonesimulator5.0 iphonesimulator6.0}
     osx_sdks = %w{macosx}
     osx_projects = %w{RKMacOSX}
-    
+
     examples_path = File.join(File.expand_path(File.dirname(__FILE__)), 'Examples')
     example_projects = `find #{examples_path} -name '*.xcodeproj'`.split("\n")
     puts "Building #{example_projects.size} Example projects..."
@@ -162,6 +162,6 @@ namespace :build do
 end
 
 desc "Validate a branch is ready for merging by checking for common issues"
-task :validate => ['build:examples', 'docs:check', :test] do  
+task :validate => ['build:examples', 'docs:check', :test] do
   puts "Project state validated successfully. Proceed with merge."
 end
