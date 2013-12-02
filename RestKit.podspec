@@ -1,26 +1,28 @@
 Pod::Spec.new do |s|
   s.name         =  'RestKit'
-  s.version      =  '0.9.13'
+  s.version      =  '0.9.4'
   s.summary      =  'RestKit is a framework for consuming and modeling RESTful web resources on iOS and OS X.'
   s.homepage     =  'http://www.restkit.org'
   s.author       =  { 'Blake Watters' => 'blakewatters@gmail.com' }
-  s.source       =  { :git => 'https://github.com/fishman/RestKit.git', :tag => 'v0.9.13' }
+  s.source       =  { :git => 'https://github.com/fishman/RestKit.git', :tag => '0.9.4' }
   s.license      =  'Apache License, Version 2.0'
 
   s.source_files =  'Code/RestKit.h'
 
   ### Preferred dependencies
 
-  s.preferred_dependency = 'JSON'
+  s.default_subspec = 'JSON'
 
   s.subspec 'JSON' do |js|
     js.dependency 'RestKit/Network'
+    js.dependency 'RestKit/ObjectMapping'
     js.dependency 'RestKit/ObjectMapping/JSON'
     js.dependency 'RestKit/ObjectMapping/CoreData'
   end
 
   s.subspec 'XML' do |xs|
     xs.dependency 'RestKit/Network'
+    xs.dependency 'RestKit/ObjectMapping'
     xs.dependency 'RestKit/ObjectMapping/XML'
     xs.dependency 'RestKit/ObjectMapping/CoreData'
   end
