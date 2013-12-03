@@ -71,9 +71,7 @@ static RKObjectManager* sharedManager = nil;
 
 + (RKObjectManager*)objectManagerWithBaseURL:(NSString*)baseURL {
 	RKObjectManager* manager = [[[self alloc] initWithBaseURL:baseURL] autorelease];
-	if (nil == sharedManager) {
-		[RKObjectManager setSharedManager:manager];
-	}
+    [RKObjectManager setSharedManager:manager];
 	return manager;
 }
 
