@@ -24,15 +24,17 @@ EOS
   s.header_mappings_dir = 'Code'
 
   s.subspec 'JSON' do |js|
+    js.dependency 'RestKit/ObjectMapping'
     js.dependency 'RestKit/Network'
     js.dependency 'RestKit/ObjectMapping/JSON'
-    js.dependency 'RestKit/ObjectMapping/CoreData'
+    js.dependency 'RestKit/CoreData'
   end
 
   s.subspec 'XML' do |xs|
+    xs.dependency 'RestKit/ObjectMapping'
     xs.dependency 'RestKit/Network'
     xs.dependency 'RestKit/ObjectMapping/XML'
-    xs.dependency 'RestKit/ObjectMapping/CoreData'
+    xs.dependency 'RestKit/CoreData'
   end
 
   ### Subspecs
