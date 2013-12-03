@@ -83,7 +83,7 @@ EOS
   end
 
   s.subspec 'CoreData' do |cdos|
-    cdos.source_files = 'Code/CoreData'
+    cdos.source_files = 'Code/CoreData', 'Code/CoreData.h'
     cdos.frameworks   = 'CoreData'
   end
 
