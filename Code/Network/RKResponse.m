@@ -175,6 +175,8 @@ extern NSString* cacheURLKey;
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [_request invalidateTimeoutTimer];
+
 	[_body appendData:data];
 }
 
