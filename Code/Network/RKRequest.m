@@ -427,11 +427,14 @@
     [self cancelAndInformDelegate:YES];
 }
 - (void)createTimeoutTimer {
-    _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
+    if(_isLoaded == NO) {
+        _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
+    }
 }
 
 - (void)timeout {
     [self cancelAndInformDelegate:NO];
+    _isLoaded = YES;
     RKLogError(@"Failed to send request to %@ due to connection timeout. Timeout interval = %f", [[self URL] absoluteString], self.timeoutInterval);
     NSString* errorMessage = [NSString stringWithFormat:@"The client timed out connecting to the resource at %@", [[self URL] absoluteString]];
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
