@@ -183,10 +183,12 @@ extern NSString* cacheURLKey;
     RKLogDebug(@"Headers: %@", [response allHeaderFields]);
     RKLogTrace(@"Read response body: %@", [self bodyAsString]);
 	_httpURLResponse = [response retain];
+    [_request invalidateTimeoutTimer];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	[_request didFinishLoad:self];
+    [_request invalidateTimeoutTimer];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {

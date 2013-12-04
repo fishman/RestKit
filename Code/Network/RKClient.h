@@ -148,6 +148,13 @@ NSString* RKPathAppendQueryParams(NSString* resourcePath, NSDictionary* queryPar
  */
 @property(nonatomic, readonly) NSMutableDictionary* HTTPHeaders;
 
+/**
+ * An optional timeout interval within which the request should be cancelled.
+ * This is passed along to RKRequest if set.  If it isn't set, it will default
+ * to RKRequest's default timeoutInterval.
+ */
+@property (nonatomic, assign) NSTimeInterval timeoutInterval;
+
 #ifdef RESTKIT_SSL_VALIDATION
 /**
  * A set of additional certificates to be used in evaluating server

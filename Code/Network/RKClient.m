@@ -98,6 +98,7 @@ NSString* RKPathAppendQueryParams(NSString* resourcePath, NSDictionary* queryPar
 @synthesize serviceUnavailableAlertEnabled = _serviceUnavailableAlertEnabled;
 @synthesize cache = _cache;
 @synthesize cachePolicy = _cachePolicy;
+@synthesize timeoutInterval = _timeoutInterval;
 
 + (RKClient*)sharedClient {
 	return sharedClient;
@@ -209,6 +210,11 @@ NSString* RKPathAppendQueryParams(NSString* resourcePath, NSDictionary* queryPar
     request.forceBasicAuthentication = self.forceBasicAuthentication;
 	request.cachePolicy = self.cachePolicy;
     request.cache = self.cache;
+    // If a timeoutInterval was set on the client, we'll pass it on to the request.
+    // Otherwise, we'll let the request default to its own timeout interval.
+    if (self.timeoutInterval) {
+        request.timeoutInterval = self.timeoutInterval;
+    }
 }
 
 - (void)setValue:(NSString*)value forHTTPHeaderField:(NSString*)header {

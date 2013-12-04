@@ -28,7 +28,7 @@
 @synthesize URL = _URL, URLRequest = _URLRequest, delegate = _delegate, additionalHTTPHeaders = _additionalHTTPHeaders,
             params = _params, userData = _userData, username = _username, password = _password, method = _method,
             forceBasicAuthentication = _forceBasicAuthentication, cachePolicy = _cachePolicy, cache = _cache,
-            cacheTimeoutInterval = _cacheTimeoutInterval;
+            cacheTimeoutInterval = _cacheTimeoutInterval,  timeoutInterval = _timeoutInterval;
 
 #if TARGET_OS_IPHONE
 @synthesize backgroundPolicy = _backgroundPolicy, backgroundTaskIdentifier = _backgroundTaskIdentifier;
@@ -46,6 +46,7 @@
         _forceBasicAuthentication = NO;
 		_cachePolicy = RKRequestCachePolicyDefault;
         _cacheTimeoutInterval = 0;
+        _timeoutInterval = 120.0;
 	}
 	return self;
 }
@@ -126,6 +127,9 @@
   	_password = nil;
     [_cache release];
     _cache = nil;
+    [self invalidateTimeoutTimer];
+    [_timeoutTimer release];
+    _timeoutTimer = nil;
     
     // Cleanup a background task if there is any
     [self cleanupBackgroundTask];
@@ -219,6 +223,7 @@
 	[_connection release];
 	_connection = nil;
 	_isLoading = NO;
+    [self invalidateTimeoutTimer];
     
     if (informDelegate && [_delegate respondsToSelector:@selector(requestDidCancelLoad:)]) {
         [_delegate requestDidCancelLoad:self];
@@ -268,6 +273,7 @@
     
     RKResponse* response = [[[RKResponse alloc] initWithRequest:self] autorelease];
     _connection = [[NSURLConnection connectionWithRequest:_URLRequest delegate:response] retain];
+    _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestSentNotification object:self userInfo:nil];
 }
@@ -373,6 +379,7 @@
         [self didFinishLoad:response];
     } else if ([self shouldDispatchRequest]) {
       RKLogDebug(@"Sending synchronous %@ request to URL %@.", [self HTTPMethod], [[self URL] absoluteString]);
+          _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
 		  if (![self prepareURLRequest]) {
       // TODO: Logging
         return nil;
@@ -418,6 +425,22 @@
 
 - (void)cancel {
     [self cancelAndInformDelegate:YES];
+}
+
+- (void)timeout {
+    [self cancelAndInformDelegate:NO];
+    RKLogError(@"Failed to send request to %@ due to connection timeout. Timeout interval = %f", [[self URL] absoluteString], self.timeoutInterval);
+    NSString* errorMessage = [NSString stringWithFormat:@"The client timed out connecting to the resource at %@", [[self URL] absoluteString]];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+        errorMessage, NSLocalizedDescriptionKey,
+        nil];
+    NSError* error = [NSError errorWithDomain:RKRestKitErrorDomain code:RKRequestConnectionTimeoutError userInfo:userInfo];
+    [self didFailLoadWithError:error];
+}
+
+- (void)invalidateTimeoutTimer {
+    [_timeoutTimer invalidate];
+    _timeoutTimer = nil;
 }
 
 - (void)didFailLoadWithError:(NSError*)error {

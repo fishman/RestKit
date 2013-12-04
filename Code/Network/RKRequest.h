@@ -90,6 +90,7 @@ typedef enum RKRequestBackgroundPolicy {
     BOOL _forceBasicAuthentication;
     RKRequestCache* _cache;
     NSTimeInterval _cacheTimeoutInterval;
+    NSTimer *_timeoutTimer;
     
     #if TARGET_OS_IPHONE
     RKRequestBackgroundPolicy _backgroundPolicy;
@@ -136,6 +137,14 @@ typedef enum RKRequestBackgroundPolicy {
  * An opaque pointer to associate user defined data with the request.
  */
 @property(nonatomic, retain) id userData;
+
+/**
+ * The timeout interval within which the request should be cancelled
+ * if no data has been received
+ *
+ * @default 120.0
+ */
+@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 /**
  * The policy to take on transition to the background (iOS 4.x and higher only)
@@ -255,6 +264,18 @@ typedef enum RKRequestBackgroundPolicy {
  * to ensure no more messages are sent to it.
  */
 - (void)cancel;
+
+/**
+ * Cancels request due to connection timeout exceeded.
+ * This will return an RKRequestConnectionTimeoutError via didFailLoadWithError:
+ */
+- (void)timeout;
+
+/**
+ * Invalidates the timeout timer.
+ * Called by RKResponse when the NSURLConnection begins receiving data.
+ */
+- (void)invalidateTimeoutTimer;
 
 /**
  * Returns YES when this is a GET request

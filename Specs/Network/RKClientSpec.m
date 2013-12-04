@@ -72,6 +72,13 @@
     assertThatBool([RKRequestQueue sharedQueue].suspended, is(equalToBool(NO)));
 }
 
+- (void)itShouldAllowYouToChangeTheTimeoutInterval {
+    RKClient* client = [RKClient clientWithBaseURL:@"http://restkit.org"];
+    client.timeoutInterval = 20.0;
+    RKRequest* request = [client requestWithResourcePath:@"" delegate:nil];
+    assertThatFloat(request.timeoutInterval, is(equalToFloat(20.0)));
+}
+
 - (void)itShouldPerformAPUTWithParams {
     RKClient* client = [RKClient clientWithBaseURL:@"http://ohblockhero.appspot.com/api/v1"];
     client.cachePolicy = RKRequestCachePolicyNone;
