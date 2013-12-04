@@ -273,7 +273,6 @@
     
     RKResponse* response = [[[RKResponse alloc] initWithRequest:self] autorelease];
     _connection = [[NSURLConnection connectionWithRequest:_URLRequest delegate:response] retain];
-    _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:RKRequestSentNotification object:self userInfo:nil];
 }
@@ -309,6 +308,7 @@
         _isLoading = YES;
         [self didFinishLoad:response];
     } else if ([self shouldDispatchRequest]) {
+        [self createTimeoutTimer];
 #if TARGET_OS_IPHONE
         // Background Request Policy support
         UIApplication* app = [UIApplication sharedApplication];
@@ -379,7 +379,7 @@
         [self didFinishLoad:response];
     } else if ([self shouldDispatchRequest]) {
       RKLogDebug(@"Sending synchronous %@ request to URL %@.", [self HTTPMethod], [[self URL] absoluteString]);
-          _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
+          [self createTimeoutTimer];
 		  if (![self prepareURLRequest]) {
       // TODO: Logging
         return nil;
@@ -425,6 +425,9 @@
 
 - (void)cancel {
     [self cancelAndInformDelegate:YES];
+}
+- (void)createTimeoutTimer {
+    _timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:self.timeoutInterval target:self selector:@selector(timeout) userInfo:nil repeats:NO];
 }
 
 - (void)timeout {
