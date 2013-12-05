@@ -190,7 +190,6 @@ extern NSString* cacheURLKey;
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	[_request didFinishLoad:self];
-    [_request invalidateTimeoutTimer];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
